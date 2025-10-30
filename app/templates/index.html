@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanet Dashboard & Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c2e 0%, #1a1a4a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5em;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #4ecdc4;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: #ff6b6b;
+            color: #4ecdc4;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 20px;
+            width: calc(100% - 280px);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-section, .prediction-section, .info-section, .doc-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #4ecdc4;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            height: 300px;
+        }
+
+        .prediction-form {
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            color: #4ecdc4;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2);
+        }
+
+        .predict-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-right: 15px;
+        }
+
+        .predict-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .sample-data-btn {
+            background: linear-gradient(45deg, #ffe66d, #ffb347);
+            color: #333;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .sample-data-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .result-container {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .result-card p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        /* Info Section Styles */
+        .feature-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .class-badge {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .false-positive {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        }
+
+        .candidate {
+            background: linear-gradient(45deg, #ffe66d, #ffeb85);
+            color: #333;
+        }
+
+        .confirmed {
+            background: linear-gradient(45deg, #4ecdc4, #6de5dd);
+        }
+
+        /* Documentation Styles */
+        .endpoint-list {
+            margin: 20px 0;
+        }
+
+        .endpoint {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .endpoint code {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4ecdc4;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .success-message {
+            background: rgba(78, 205, 196, 0.2);
+            border-left: 4px solid #4ecdc4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .button-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .sidebar-nav li {
+                flex-shrink: 0;
+            }
+            
+            .nav-link {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+            
+            .nav-link.active {
+                border-left: none;
+                border-bottom-color: #ff6b6b;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .predict-btn, .sample-data-btn {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>🌌 Exoplanet</h2>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="/" class="nav-link active" data-page="prediction">🔮 Prediction</a></li>
+                <li><a href="/analytics" class="nav-link" data-page="analytics">📊 Analytics</a></li>
+                <li><a href="/dataset" class="nav-link" data-page="dataset">📁 Dataset Info</a></li>
+                <li><a href="/details" class="nav-link" data-page="details">📚 Documentation</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Prediction Page -->
+            <div id="prediction-page" class="page active">
+                <header>
+                    <h1>🔮 Exoplanet Classification Predictor</h1>
+                    <p>Predict whether celestial objects are exoplanets, candidates, or false positives</p>
+                </header>
+
+                <section class="prediction-section">
+                    <form id="prediction-form" class="prediction-form">
+                        <div class="form-grid">
+                            <!-- Principal Components -->
+                            <div class="form-group">
+                                <label for="PC1">PC1:</label>
+                                <input type="number" step="any" id="PC1" name="PC1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="PC2">PC2:</label>
+                                <input type="number" step="any" id="PC2" name="PC2" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="PC3">PC3:</label>
+                                <input type="number" step="any" id="PC3" name="PC3" required>
+                            </div>
+                            
+                            <!-- Astronomical Coordinates -->
+                            <div class="form-group">
+                                <label for="ra">Right Ascension (ra):</label>
+                                <input type="number" step="any" id="ra" name="ra" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dec">Declination (dec):</label>
+                                <input type="number" step="any" id="dec" name="dec" required>
+                            </div>
+                            
+                            <!-- Magnitudes -->
+                            <div class="form-group">
+                                <label for="j_mag">J Magnitude:</label>
+                                <input type="number" step="any" id="j_mag" name="j_mag" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="h_mag">H Magnitude:</label>
+                                <input type="number" step="any" id="h_mag" name="h_mag" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="k_mag">K Magnitude:</label>
+                                <input type="number" step="any" id="k_mag" name="k_mag" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="kep_mag">Kepler Magnitude:</label>
+                                <input type="number" step="any" id="kep_mag" name="kep_mag" required>
+                            </div>
+                            
+                            <!-- Planet Properties -->
+                            <div class="form-group">
+                                <label for="planet_radius">Planet Radius (Earth radii):</label>
+                                <input type="number" step="any" id="planet_radius" name="planet_radius" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="orbital_period">Orbital Period (days):</label>
+                                <input type="number" step="any" id="orbital_period" name="orbital_period" required>
+                            </div>
+                            
+                            <!-- Star Properties -->
+                            <div class="form-group">
+                                <label for="star_teff">Star Temperature (K):</label>
+                                <input type="number" step="any" id="star_teff" name="star_teff" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="star_logg">Star Surface Gravity (logg):</label>
+                                <input type="number" step="any" id="star_logg" name="star_logg" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="star_radius">Star Radius (Solar radii):</label>
+                                <input type="number" step="any" id="star_radius" name="star_radius" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="star_mass">Star Mass (Solar masses):</label>
+                                <input type="number" step="any" id="star_mass" name="star_mass" required>
+                            </div>
+                            
+                            <!-- Light Curve -->
+                            <div class="form-group">
+                                <label for="lc_time0">Light Curve Time 0:</label>
+                                <input type="number" step="any" id="lc_time0" name="lc_time0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button type="submit" class="predict-btn">Predict Classification</button>
+                            <button type="button" class="sample-data-btn">Load Sample Data</button>
+                        </div>
+                    </form>
+                    
+                    <div id="prediction-result" class="result-container" style="display: none;">
+                        <h3>Prediction Result:</h3>
+                        <div class="result-card">
+                            <p><strong>Classification:</strong> <span id="prediction-class"></span></p>
+                            <p><strong>Confidence:</strong> <span id="prediction-confidence"></span></p>
+                        </div>
+                    </div>
+                    
+                    <div id="error-message" class="error-message" style="display: none;">
+                        <p id="error-text"></p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analytics-page" class="page">
+                <header>
+                    <h1>📊 Analytics Dashboard</h1>
+                    <p>Explore dataset statistics and visualizations</p>
+                </header>
+
+                <section class="dashboard-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Records</h3>
+                            <p id="total-records">Loading...</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Confirmed Planets</h3>
+                            <p id="confirmed-planets">Loading...</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Candidates</h3>
+                            <p id="candidates">Loading...</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>False Positives</h3>
+                            <p id="false-positives">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="classDistributionChart"></canvas>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-wrapper">
+                            <canvas id="featureImportanceChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="correlationChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Dataset Info Page -->
+            <div id="dataset-page" class="page">
+                <header>
+                    <h1>📁 Dataset Information</h1>
+                    <p>Learn about the Exoplanet dataset and its features</p>
+                </header>
+
+                <section class="info-section">
+                    <div class="info-card">
+                        <h3>Dataset Overview</h3>
+                        <p>The dataset contains astronomical observations from NASA's Kepler mission with features derived from light curve analysis and stellar properties.</p>
+                        
+                        <h4>Key Features:</h4>
+                        <ul class="feature-list">
+                            <li><strong>PC1, PC2, PC3:</strong> Principal Components from dimensionality reduction</li>
+                            <li><strong>ra, dec:</strong> Celestial coordinates (Right Ascension, Declination)</li>
+                            <li><strong>Magnitudes (J, H, K, Kepler):</strong> Brightness measurements in different filters</li>
+                            <li><strong>Planet Properties:</strong> Radius, Orbital Period</li>
+                            <li><strong>Star Properties:</strong> Temperature, Surface Gravity, Radius, Mass</li>
+                            <li><strong>Light Curve Data:</strong> Time series photometric measurements</li>
+                        </ul>
+
+                        <h4>Target Classes:</h4>
+                        <div class="classes-grid">
+                            <div class="class-badge false-positive">False Positive (0)</div>
+                            <div class="class-badge candidate">Candidate (1)</div>
+                            <div class="class-badge confirmed">Confirmed Planet (2)</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Documentation Page -->
+            <div id="documentation-page" class="page">
+                <header>
+                    <h1>📚 Project Documentation</h1>
+                    <p>Technical details and implementation information</p>
+                </header>
+
+                <section class="doc-section">
+                    <div class="doc-card">
+                        <h3>Project Architecture</h3>
+                        <p>This application uses a machine learning model to classify celestial objects as exoplanets, candidates, or false positives based on astronomical data.</p>
+
+                        <h4>Technology Stack:</h4>
+                        <ul>
+                            <li><strong>Backend:</strong> FastAPI (Python)</li>
+                            <li><strong>Frontend:</strong> HTML, CSS, JavaScript</li>
+                            <li><strong>ML Framework:</strong> Scikit-learn</li>
+                            <li><strong>Visualization:</strong> Chart.js</li>
+                            <li><strong>Data Processing:</strong> Pandas, NumPy</li>
+                        </ul>
+
+                        <h4>Model Details:</h4>
+                        <p>The classification model is trained on NASA's exoplanet dataset using supervised learning algorithms. It processes 16 input features to predict one of three classes.</p>
+
+                        <h4>API Endpoints:</h4>
+                        <div class="endpoint-list">
+                            <div class="endpoint">
+                                <code>GET /api/summary</code>
+                                <span>Returns dataset statistics</span>
+                            </div>
+                            <div class="endpoint">
+                                <code>POST /api/predict</code>
+                                <span>Makes classification predictions</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global variables
+        let classDistributionChart;
+        let featureImportanceChart;
+        let correlationChart;
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNavigation();
+            setupPredictionForm();
+            
+            // Load data if we're on analytics page
+            loadDashboardData();
+        });
+
+        // Setup navigation between pages
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+            
+            // Set active page based on current URL
+            const currentPath = window.location.pathname;
+            let activePage = 'prediction';
+            
+            if (currentPath === '/analytics') activePage = 'analytics';
+            else if (currentPath === '/dataset') activePage = 'dataset';
+            else if (currentPath === '/details') activePage = 'documentation';
+            
+            // Update active states
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === activePage) {
+                    link.classList.add('active');
+                }
+            });
+            
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === `${activePage}-page`) {
+                    page.classList.add('active');
+                }
+            });
+            
+            // Add click handlers for navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetPage = this.getAttribute('data-page');
+                    const targetUrl = targetPage === 'prediction' ? '/' : `/${targetPage}`;
+                    
+                    // Update URL without full page reload
+                    window.history.pushState({}, '', targetUrl);
+                    
+                    // Update active states
+                    navLinks.forEach(nl => nl.classList.remove('active'));
+                    pages.forEach(page => page.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(`${targetPage}-page`).classList.add('active');
+                    
+                    // Load data for analytics page
+                    if (targetPage === 'analytics') {
+                        loadDashboardData();
+                    }
+                });
+            });
+            
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function() {
+                setupNavigation();
+            });
+        }
+
+        // Enhanced load dashboard data function
+        async function loadDashboardData() {
+            try {
+                showLoadingState(['total-records', 'confirmed-planets', 'candidates', 'false-positives']);
+                
+                const response = await fetch('/api/summary');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // Update statistics
+                updateStatCard('total-records', data.total_records.toLocaleString());
+                updateStatCard('confirmed-planets', data.class_distribution['2'] || 0);
+                updateStatCard('candidates', data.class_distribution['1'] || 0);
+                updateStatCard('false-positives', data.class_distribution['0'] || 0);
+                
+                // Create charts
+                createClassDistributionChart(data.class_distribution);
+                createFeatureImportanceChart();
+                createCorrelationChart();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showErrorState(['total-records', 'confirmed-planets', 'candidates', 'false-positives']);
+            }
+        }
+
+        // Helper functions for loading states
+        function showLoadingState(ids) {
+            ids.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<div class="loading-spinner"></div>';
+                }
+            });
+        }
+
+        function updateStatCard(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        function showErrorState(ids) {
+            ids.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = 'Error';
+                    element.style.color = '#ff6b6b';
+                }
+            });
+        }
+
+        // Enhanced prediction form handler
+        function setupPredictionForm() {
+            const form = document.getElementById('prediction-form');
+            if (form) {
+                form.addEventListener('submit', handlePrediction);
+                
+                // Add sample data button for testing
+                const sampleBtn = document.querySelector('.sample-data-btn');
+                if (sampleBtn) {
+                    sampleBtn.addEventListener('click', loadSampleData);
+                }
+            }
+        }
+
+        function loadSampleData() {
+            const sampleData = {
+                PC1: -0.401851995,
+                PC2: -0.13277624,
+                PC3: -0.000638216,
+                ra: 158.0734448,
+                dec: 44.4568867,
+                j_mag: 12.5,
+                h_mag: 12.2,
+                k_mag: 12.1,
+                kep_mag: 14.3,
+                planet_radius: 1.2,
+                orbital_period: 15.8,
+                star_teff: 5800,
+                star_logg: 4.3,
+                star_radius: 1.1,
+                star_mass: 1.0,
+                lc_time0: 0.0
+            };
+            
+            Object.keys(sampleData).forEach(key => {
+                const input = document.getElementById(key);
+                if (input) {
+                    input.value = sampleData[key];
+                }
+            });
+            
+            // Show success message
+            showMessage('Sample data loaded successfully!', 'success');
+        }
+
+        // Enhanced prediction handler
+        async function handlePrediction(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const inputData = {};
+            
+            // Convert form data to object
+            for (let [key, value] of formData.entries()) {
+                inputData[key] = parseFloat(value);
+            }
+            
+            // Validate all fields are filled
+            if (Object.keys(inputData).length !== 16) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const predictBtn = form.querySelector('.predict-btn');
+            const originalText = predictBtn.textContent;
+            predictBtn.textContent = 'Predicting...';
+            predictBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                displayPredictionResult(result);
+                
+            } catch (error) {
+                console.error('Prediction error:', error);
+                showMessage('Error making prediction. Please try again.', 'error');
+            } finally {
+                // Reset button
+                predictBtn.textContent = originalText;
+                predictBtn.disabled = false;
+            }
+        }
+
+        // Enhanced result display
+        function displayPredictionResult(result) {
+            const resultContainer = document.getElementById('prediction-result');
+            const predictionClass = document.getElementById('prediction-class');
+            const predictionConfidence = document.getElementById('prediction-confidence');
+            
+            if (!resultContainer || !predictionClass || !predictionConfidence) {
+                console.error('Result display elements not found');
+                return;
+            }
+            
+            predictionClass.textContent = result.class_name;
+            predictionConfidence.textContent = `${(result.confidence * 100).toFixed(2)}%`;
+            
+            // Add color coding based on prediction
+            const classColors = {
+                'False Positive': '#ff6b6b',
+                'Candidate': '#ffe66d',
+                'Confirmed Planet': '#4ecdc4'
+            };
+            
+            predictionClass.style.color = classColors[result.class_name] || '#ffffff';
+            predictionConfidence.style.color = classColors[result.class_name] || '#ffffff';
+            
+            resultContainer.style.display = 'block';
+            
+            // Scroll to result with smooth animation
+            resultContainer.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            // Hide any error messages
+            hideMessage();
+        }
+
+        // Message display functions
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('error-message');
+            const messageText = document.getElementById('error-text');
+            
+            if (messageDiv && messageText) {
+                messageText.textContent = message;
+                messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+                messageDiv.style.display = 'block';
+                
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(() => {
+                        hideMessage();
+                    }, 5000);
+                }
+            }
+        }
+
+        function hideMessage() {
+            const messageDiv = document.getElementById('error-message');
+            if (messageDiv) {
+                messageDiv.style.display = 'none';
+            }
+        }
+
+        // Create class distribution chart
+        function createClassDistributionChart(distribution) {
+            const ctx = document.getElementById('classDistributionChart').getContext('2d');
+            
+            if (classDistributionChart) {
+                classDistributionChart.destroy();
+            }
+            
+            const classNames = {
+                '0': 'False Positive',
+                '1': 'Candidate', 
+                '2': 'Confirmed Planet'
+            };
+            
+            const labels = Object.keys(distribution).map(key => classNames[key]);
+            const data = Object.values(distribution);
+            const backgroundColors = ['#ff6b6b', '#ffe66d', '#4ecdc4'];
+            
+            classDistributionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Objects',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Exoplanet Classification Distribution',
+                            color: '#ffffff',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create feature importance chart (placeholder - you can replace with real data)
+        function createFeatureImportanceChart() {
+            const ctx = document.getElementById('featureImportanceChart').getContext('2d');
+            
+            if (featureImportanceChart) {
+                featureImportanceChart.destroy();
+            }
+            
+            // Example feature importance data
+            const features = ['Star Temp', 'Planet Radius', 'Orbital Period', 'Star Mass', 'Magnitude'];
+            const importance = [0.25, 0.20, 0.18, 0.15, 0.12];
+            
+            featureImportanceChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: features,
+                    datasets: [{
+                        data: importance,
+                        backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7af', '#ffe66d', '#6c757d'],
+                        borderWidth: 2,
+                        borderColor: '#0c0c2e'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#ffffff',
+                                padding: 20
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Feature Importance',
+                            color: '#ffffff',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create correlation chart (placeholder)
+        function createCorrelationChart() {
+            const ctx = document.getElementById('correlationChart').getContext('2d');
+            
+            if (correlationChart) {
+                correlationChart.destroy();
+            }
+            
+            correlationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Confirmed Planets',
+                        data: [12, 19, 8, 15, 22, 18],
+                        borderColor: '#4ecdc4',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Monthly Discoveries',
+                            color: '#ffffff',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

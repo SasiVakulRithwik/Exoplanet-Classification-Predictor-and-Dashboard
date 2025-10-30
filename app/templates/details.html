@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Exoplanet Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c2e 0%, #1a1a4a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5em;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #4ecdc4;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: #ff6b6b;
+            color: #4ecdc4;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .doc-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #4ecdc4;
+            border-bottom: 2px solid #4ecdc4;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            margin: 25px 0 15px 0;
+            color: #ff6b6b;
+        }
+
+        h4 {
+            margin: 20px 0 10px 0;
+            color: #4ecdc4;
+        }
+
+        .doc-card {
+            max-width: 100%;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tech-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tech-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .tech-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin-bottom: 10px;
+        }
+
+        .endpoint-list {
+            margin: 25px 0;
+        }
+
+        .endpoint {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .endpoint-method {
+            background: #4ecdc4;
+            color: #0c0c2e;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        .endpoint-desc {
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .arch-component {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .arch-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .arch-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            color: #4ecdc4;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #ffe66d;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #4ecdc4;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: #4ecdc4;
+            margin-bottom: 8px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #4ecdc4;
+            font-size: 0.9em;
+        }
+
+        .feature-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .feature-category {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .category-title {
+            color: #ffe66d;
+            margin-bottom: 15px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .category-features {
+            list-style: none;
+        }
+
+        .category-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .category-features li:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .sidebar-nav li {
+                flex-shrink: 0;
+            }
+            
+            .nav-link {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+            
+            .nav-link.active {
+                border-left: none;
+                border-bottom-color: #ff6b6b;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .architecture-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .workflow-step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-number {
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>🌌 Exoplanet</h2>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="/" class="nav-link" data-page="prediction">🔮 Prediction</a></li>
+                <li><a href="/analytics" class="nav-link" data-page="analytics">📊 Analytics</a></li>
+                <li><a href="/dataset" class="nav-link" data-page="dataset">📁 Dataset Info</a></li>
+                <li><a href="/details" class="nav-link active" data-page="details">📚 Documentation</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <h1>📚 Project Documentation</h1>
+                <p>Complete technical documentation and implementation guide</p>
+            </header>
+
+            <section class="doc-section">
+                <div class="doc-card">
+                    <h2>🚀 Project Overview</h2>
+                    <p>The Exoplanet Classification Dashboard is a comprehensive machine learning web application that classifies celestial objects as exoplanets, candidates, or false positives using NASA's Kepler mission data. The system provides real-time predictions, comprehensive analytics, and interactive visualizations to help astronomers and researchers identify potential exoplanets more efficiently.</p>
+
+                    <div class="info-card">
+                        <h4>🎯 Project Goals</h4>
+                        <ul class="feature-list">
+                            <li>Automate the classification of celestial objects using machine learning</li>
+                            <li>Provide an intuitive interface for astronomers and researchers</li>
+                            <li>Offer comprehensive analytics and visualization tools</li>
+                            <li>Enable real-time predictions with confidence scores</li>
+                            <li>Support data-driven decision making in exoplanet research</li>
+                        </ul>
+                    </div>
+
+                    <h3>Technology Stack</h3>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <div class="tech-icon">🐍</div>
+                            <div class="tech-name">FastAPI</div>
+                            <p>High-performance Python web framework for building robust APIs with automatic documentation</p>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-icon">🤖</div>
+                            <div class="tech-name">Scikit-learn</div>
+                            <p>Comprehensive machine learning library for model training, evaluation, and deployment</p>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-icon">📊</div>
+                            <div class="tech-name">Chart.js</div>
+                            <p>Interactive JavaScript charts for dynamic data visualization and analytics</p>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-icon">🎨</div>
+                            <div class="tech-name">CSS3</div>
+                            <p>Modern styling with gradients, animations, and responsive design principles</p>
+                        </div>
+                    </div>
+
+                    <h3>System Architecture</h3>
+                    <div class="architecture-grid">
+                        <div class="arch-component">
+                            <div class="arch-icon">🌐</div>
+                            <div class="arch-title">Frontend Layer</div>
+                            <p>Responsive web interface with real-time updates and interactive visualizations</p>
+                            <ul class="feature-list">
+                                <li>Multi-page navigation system</li>
+                                <li>Real-time prediction interface</li>
+                                <li>Interactive analytics dashboard</li>
+                                <li>Mobile-responsive design</li>
+                                <li>Dynamic chart rendering</li>
+                            </ul>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon">⚡</div>
+                            <div class="arch-title">API Layer</div>
+                            <p>RESTful API built with FastAPI for data processing and predictions</p>
+                            <ul class="feature-list">
+                                <li>JSON request/response format</li>
+                                <li>Automatic data validation</li>
+                                <li>Comprehensive error handling</li>
+                                <li>CORS support for cross-origin requests</li>
+                                <li>Automatic API documentation</li>
+                            </ul>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon">🧠</div>
+                            <div class="arch-title">ML Layer</div>
+                            <p>Machine learning model for classification with pre-processing pipeline</p>
+                            <ul class="feature-list">
+                                <li>Model persistence and loading</li>
+                                <li>Feature scaling and normalization</li>
+                                <li>Probability calibration</li>
+                                <li>Batch prediction support</li>
+                                <li>Model performance monitoring</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Machine Learning Model</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Model Type</div>
+                            <div class="info-value">Random Forest</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Training Data</div>
+                            <div class="info-value">NASA Exoplanet Archive</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Features</div>
+                            <div class="info-value">16 Parameters</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Classes</div>
+                            <div class="info-value">3 Categories</div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">77.38%</div>
+                            <div class="metric-label">Test Accuracy</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">76.77%</div>
+                            <div class="metric-label">Cross-validation Score</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">0.83</div>
+                            <div class="metric-label">Precision (Macro)</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">0.70</div>
+                            <div class="metric-label">Recall (Macro)</div>
+                        </div>
+                    </div>
+
+                    <h4>Model Training Process</h4>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">Data Collection</div>
+                                <p>Gather astronomical data from NASA Exoplanet Archive, including light curves, stellar properties, and planetary characteristics</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">Feature Engineering</div>
+                                <p>Extract and select relevant features, perform dimensionality reduction, and create principal components</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-title">Data Splitting</div>
+                                <p>Divide dataset into training (80%) and testing (20%) sets while maintaining class distribution</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <div class="step-title">Model Training</div>
+                                <p>Train Random Forest classifier with hyperparameter tuning and cross-validation</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <div class="step-title">Evaluation</div>
+                                <p>Assess model performance using accuracy, precision, recall, F1-score, and confusion matrix</p>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <div class="step-title">Deployment</div>
+                                <p>Serialize model and preprocessor for integration with the web application</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Feature Categories</h3>
+                    <div class="feature-categories">
+                        <div class="feature-category">
+                            <div class="category-title">🌌 Principal Components</div>
+                            <ul class="category-features">
+                                <li>PC1, PC2, PC3 - Dimensionality reduced features from original light curve data</li>
+                            </ul>
+                        </div>
+                        <div class="feature-category">
+                            <div class="category-title">📍 Celestial Coordinates</div>
+                            <ul class="category-features">
+                                <li>Right Ascension (ra) - Celestial longitude coordinate</li>
+                                <li>Declination (dec) - Celestial latitude coordinate</li>
+                            </ul>
+                        </div>
+                        <div class="feature-category">
+                            <div class="category-title">⭐ Stellar Properties</div>
+                            <ul class="category-features">
+                                <li>Star Temperature - Effective temperature in Kelvin</li>
+                                <li>Surface Gravity (logg) - Logarithm of surface gravity</li>
+                                <li>Star Radius - Radius in solar units</li>
+                                <li>Star Mass - Mass in solar units</li>
+                            </ul>
+                        </div>
+                        <div class="feature-category">
+                            <div class="category-title">🪐 Planetary Characteristics</div>
+                            <ul class="category-features">
+                                <li>Planet Radius - Radius in Earth radii units</li>
+                                <li>Orbital Period - Orbital period in days</li>
+                            </ul>
+                        </div>
+                        <div class="feature-category">
+                            <div class="category-title">📊 Photometric Data</div>
+                            <ul class="category-features">
+                                <li>J, H, K Magnitudes - Infrared brightness measurements</li>
+                                <li>Kepler Magnitude - Visible light brightness</li>
+                            </ul>
+                        </div>
+                        <div class="feature-category">
+                            <div class="category-title">📈 Light Curve Features</div>
+                            <ul class="category-features">
+                                <li>Light Curve Time 0 - Reference time for light curve analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Target Classification</h3>
+                    <div class="architecture-grid">
+                        <div class="arch-component">
+                            <div class="arch-icon">❌</div>
+                            <div class="arch-title">False Positive (0)</div>
+                            <p>Signals caused by instrumental errors, stellar activity, or binary star systems that mimic planetary transits</p>
+                            <ul class="feature-list">
+                                <li>Instrumental artifacts</li>
+                                <li>Stellar variability</li>
+                                <li>Eclipsing binaries</li>
+                                <li>Systematic errors</li>
+                            </ul>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon">🔍</div>
+                            <div class="arch-title">Candidate (1)</div>
+                            <p>Potential exoplanets requiring further verification through additional observations and analysis</p>
+                            <ul class="feature-list">
+                                <li>Promising transit signals</li>
+                                <li>Requires confirmation</li>
+                                <li>Follow-up observations needed</li>
+                                <li>Statistical validation required</li>
+                            </ul>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon">✅</div>
+                            <div class="arch-title">Confirmed Planet (2)</div>
+                            <p>Verified exoplanets with multiple detection confirmations through different methods</p>
+                            <ul class="feature-list">
+                                <li>Multiple detection methods</li>
+                                <li>Statistical significance</li>
+                                <li>Peer-reviewed confirmation</li>
+                                <li>Published in scientific literature</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>API Documentation</h3>
+                    <div class="endpoint-list">
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="endpoint-method">GET</span>
+                                <span class="endpoint-path">/api/summary</span>
+                            </div>
+                            <div class="endpoint-desc">Retrieves comprehensive dataset statistics and summary information for the analytics dashboard, including class distribution, feature means, and dataset metrics.</div>
+                        </div>
+
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="endpoint-method">POST</span>
+                                <span class="endpoint-path">/api/predict</span>
+                            </div>
+                            <div class="endpoint-desc">Makes exoplanet classification predictions based on 16 input astronomical features, returning classification results with confidence scores.</div>
+                        </div>
+                    </div>
+
+                    <h3>Dataset Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Total Records</div>
+                            <div class="info-value">19,761</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Training Samples</div>
+                            <div class="info-value">15,808</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Testing Samples</div>
+                            <div class="info-value">3,953</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Data Source</div>
+                            <div class="info-value">NASA Archive</div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📊 Dataset Statistics</h4>
+                        <ul class="feature-list">
+                            <li>False Positives: 6,311 samples (31.9%)</li>
+                            <li>Candidates: 7,413 samples (37.5%)</li>
+                            <li>Confirmed Planets: 6,015 samples (30.4%)</li>
+                            <li>Class 3 (Unknown): 22 samples (0.1%)</li>
+                        </ul>
+                    </div>
+
+                    <h3>Feature Importance</h3>
+                    <div class="info-card">
+                        <h4>🔝 Top 10 Most Important Features</h4>
+                        <ul class="feature-list">
+                            <li>Planet Radius - 0.1459 importance score</li>
+                            <li>Light Curve Time 0 - 0.1117 importance score</li>
+                            <li>Orbital Period - 0.0928 importance score</li>
+                            <li>PC3 - 0.0845 importance score</li>
+                            <li>PC1 - 0.0722 importance score</li>
+                            <li>Kepler Magnitude - 0.0663 importance score</li>
+                            <li>Declination - 0.0617 importance score</li>
+                            <li>Right Ascension - 0.0527 importance score</li>
+                            <li>PC2 - 0.0507 importance score</li>
+                            <li>Star Temperature - 0.0503 importance score</li>
+                        </ul>
+                    </div>
+
+                    <h3>Best Model Parameters</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Max Depth</div>
+                            <div class="info-value">None</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Min Samples Leaf</div>
+                            <div class="info-value">1</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Min Samples Split</div>
+                            <div class="info-value">2</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">N Estimators</div>
+                            <div class="info-value">200</div>
+                        </div>
+                    </div>
+
+                    <h3>Performance Metrics</h3>
+                    <div class="info-card">
+                        <h4>📈 Classification Report</h4>
+                        <ul class="feature-list">
+                            <li>Precision (Macro Average): 0.83 - High accuracy in positive predictions</li>
+                            <li>Recall (Macro Average): 0.70 - Good ability to identify true positives</li>
+                            <li>F1-Score (Macro Average): 0.75 - Balanced measure of precision and recall</li>
+                            <li>Accuracy: 77.38% - Overall classification performance</li>
+                            <li>Cross-validation Score: 76.77% - Consistent performance across data splits</li>
+                        </ul>
+                    </div>
+
+                    <h3>Confusion Matrix Analysis</h3>
+                    <div class="info-card">
+                        <h4>🎯 Model Performance by Class</h4>
+                        <ul class="feature-list">
+                            <li>False Positives: 1,001 correctly classified, 223 misclassified as Candidates, 39 as Confirmed Planets</li>
+                            <li>Candidates: 1,161 correctly classified, 169 misclassified as False Positives, 153 as Confirmed Planets</li>
+                            <li>Confirmed Planets: 885 correctly classified, 84 misclassified as False Positives, 234 as Candidates</li>
+                            <li>Class 3: Limited samples with perfect classification in test set</li>
+                        </ul>
+                    </div>
+
+                    <h3>Applications & Use Cases</h3>
+                    <div class="architecture-grid">
+                        <div class="arch-component">
+                            <div class="arch-icon">🔭</div>
+                            <div class="arch-title">Astronomical Research</div>
+                            <p>Accelerate exoplanet discovery by automating initial classification of transit signals</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon">🏫</div>
+                            <div class="arch-title">Education</div>
+                            <p>Provide interactive learning tools for students studying astronomy and data science</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon">📡</div>
+                            <div class="arch-title">Mission Planning</div>
+                            <p>Support telescope time allocation by prioritizing promising candidates</p>
+                        </div>
+                    </div>
+
+                    <h3>Future Enhancements</h3>
+                    <div class="info-card">
+                        <ul class="feature-list">
+                            <li>Integration with real-time telescope data streams</li>
+                            <li>Multi-method classification combining transit and radial velocity data</li>
+                            <li>Advanced visualization of light curves and phase folds</li>
+                            <li>Collaborative features for research teams</li>
+                            <li>Export capabilities for scientific publications</li>
+                            <li>Model retraining with new discovery data</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
