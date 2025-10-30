@@ -21,6 +21,20 @@ By analyzing astronomical data from NASA's Exoplanet Archive, our model provides
 - *Data Prioritization* - Helping telescopes allocate observation time to promising candidates
 - *Educational Tool* - Making exoplanet discovery accessible to students and researchers
 
+## Website View
+
+Prediction Page
+![Prediction](/screenshots/prediction.png)
+
+Analytics Page
+![Analytics](/screenshots/analytics.png)
+
+Dataset Page
+![Dataset](/screenshots/dataset.png)
+
+Documentation Page
+![Details](/screenshots/details.png)
+
 ## 🎯 Key Features
 
 ### 🤖 Machine Learning Model
